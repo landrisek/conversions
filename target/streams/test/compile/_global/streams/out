@@ -1,0 +1,5 @@
+[0m[[0m[33mwarn[0m] [0m[0m/Users/e104300/workspace/bitbucket/ematiq/src/test/scala/service/ConversionService.scala:25:7: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: EvictKey(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m      message match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m      ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m

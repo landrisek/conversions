@@ -1,0 +1,1 @@
+{"currency":"EUR","date":"2021-05-18T21:32:42.324Z","marketId":123456,"odds":2.2,"selectionId":987654,"stake":207.52054}

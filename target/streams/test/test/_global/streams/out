@@ -1,0 +1,55 @@
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(domain.CurrencySpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(cache.ExchangeRateCacheSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(ConversionServiceSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(external.ExchangeRateServiceSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(external.ExchangeRateActorSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(api.TradeRouteSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(domain.TradeDataConversionSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(cache.ExchangeRateCacheEntrySpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning TaskDef(domain.TradeDataSpec, org.scalatest.tools.Framework$$anon$1@5987f3f4, false, [SuiteSelector])[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mCurrencySpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mThe withName method[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should return the correct Currency for valid inputs[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should throw IllegalArgumentException for unknown currencies[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTradeDataConversionSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mA TradeDataConversion[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should correctly instantiate with all parameters provided[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTradeDataSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mA TradeData[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should correctly instantiate with all parameters provided[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mExchangeRateActorSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mThe ExchangeRateActor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should retrieve exchange rate and return the rate when it gets a GetExchangeRateByDate command[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mExchangeRateCacheEntrySpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mThe ExchangeRateCacheEntry actor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should set rate and return RateRetrieved when it gets a SetRate command followed by a GetRate command[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should maintain the rate even if it gets multiple GetRate commands[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should warn if it gets a SetRate command in the cached state[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mConversionServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mConversionService actor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should reply with ConvertedStake when rate is retrieved from the cache[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTradeRouteSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mTradeRoutes[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should convert trade data to EUR on POST requests to /api/v1/conversion/trade[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mExchangeRateCacheSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mThe ExchangeRateCache actor[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should retrieve exchange rates and return RateRetrieved when it gets a GetExchangeRate command[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should evict old data when it gets an EvictKey command[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mExchangeRateServiceSpec:[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mExchangeRateService[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32m- should retrieve exchange rates[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mRun completed in 3 seconds, 723 milliseconds.[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTotal number of tests run: 13[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mSuites: completed 9, aborted 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[36mTests: succeeded 13, failed 0, canceled 0, ignored 0, pending 0[0m[0m
+[0m[[0m[0minfo[0m] [0m[0m[32mAll tests passed.[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mPassed tests:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	cache.ExchangeRateCacheEntrySpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external.ExchangeRateActorSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	api.TradeRouteSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	domain.TradeDataConversionSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	ConversionServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	domain.TradeDataSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	domain.CurrencySpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external.ExchangeRateServiceSpec[0m
+[0m[[0m[0mdebug[0m] [0m[0m	cache.ExchangeRateCacheSpec[0m

@@ -1,0 +1,11 @@
+#Successful Tests
+#Tue Jun 13 18:39:58 CEST 2023
+ConversionServiceSpec=1686674395890
+api.TradeRouteSpec=1686674396517
+cache.ExchangeRateCacheEntrySpec=1686674395934
+cache.ExchangeRateCacheSpec=1686674397853
+domain.CurrencySpec=1686674395092
+domain.TradeDataConversionSpec=1686674395092
+domain.TradeDataSpec=1686674395092
+external.ExchangeRateActorSpec=1686674395892
+external.ExchangeRateServiceSpec=1686674398393
