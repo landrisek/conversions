@@ -13,9 +13,7 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 import domain.{Convertable, Currency, TradeData}
-import external.ExchangeRateActor
 import external.ExchangeRateService
-import external.ExchangeRateActor.GetExchangeRateByDate
 import cache.ExchangeRateCache
 import cache.ExchangeRateCache.CacheResponse
 

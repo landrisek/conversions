@@ -12,6 +12,7 @@ object ExchangeRateCacheEntry {
   sealed trait Command
   case class SetRate(rate: Double) extends Command
   case class GetRate(replyTo: ActorRef[ExchangeRateCache.CacheResponse]) extends Command
+  case object RateRetrievalFailed extends Command
 
   case class State(rate: Option[Double], pending: List[ActorRef[ExchangeRateCache.CacheResponse]])
 
@@ -27,6 +28,21 @@ object ExchangeRateCacheEntry {
           cached(context, State(Some(rate), Nil))
         case GetRate(replyTo) =>
           uninitialized(context, State(state.rate, replyTo :: state.pending))
+        case RateRetrievalFailed =>
+          state.pending.foreach(_ ! ExchangeRateCache.RateNotInCache)
+          failureState(context) // transitioning to a failure state
+      }
+  }
+
+  private def failureState(context: ActorContext[Command]): Behavior[Command] = Behaviors.receive {
+    (_, message) =>
+      message match {
+        case GetRate(replyTo) => 
+          replyTo ! ExchangeRateCache.RateNotInCache
+          Behaviors.same
+        case _ => 
+          context.log.warn("Received inappropriate command in 'failureState'. This indicates a problem in the program.")
+          Behaviors.same
       }
   }
 
@@ -44,7 +60,10 @@ object ExchangeRateCacheEntry {
         case SetRate(rate) => 
           context.log.warn("Received SetRate command in 'cached' state. This indicates a problem in the program.")
           Behaviors.same
+        case RateRetrievalFailed => 
+          context.log.warn("Received RateRetrievalFailed command in 'cached' state. This indicates a problem in the program.")
+          Behaviors.same
       }
   }
-
 }
+

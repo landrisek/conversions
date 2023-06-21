@@ -7,6 +7,7 @@ import akka.stream.Materializer
 import akka.stream.ActorMaterializer
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import scala.concurrent.ExecutionContext
+import com.typesafe.config.ConfigFactory
 
 import domain.Currency
 import org.scalatest.BeforeAndAfterAll
@@ -47,9 +48,14 @@ class ExchangeRateServiceSpec extends AnyWordSpec with Matchers with BeforeAndAf
           HttpResponse.response()
             .withBody("""{ "rates": { "USD": 1.0 } }""")
         )
+        
+      val config = ConfigFactory.load()
+      
+      val mainApiClient = new MainApiClient()(config)
+      val fallbackApiClient = new FallbackApiClient()(config)
 
       // Use the real ExchangeRateService, but it will talk to our mock server instead of the real one
-      val service = new ExchangeRateService()
+      val service = new ExchangeRateService(mainApiClient, fallbackApiClient)
 
       val instant = Instant.parse("2021-05-18T21:32:42.324Z")
       val futureRate = service.retrieveExchangeRate(Currency.USD, instant)
@@ -65,7 +71,3 @@ class ExchangeRateServiceSpec extends AnyWordSpec with Matchers with BeforeAndAf
     }
   }
 }
-
-
-
-

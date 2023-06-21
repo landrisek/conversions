@@ -8,11 +8,12 @@ import akka.pattern.CircuitBreaker
 import akka.stream.Materializer
 import com.typesafe.config.ConfigFactory
 import java.time.Instant
-
+import java.util.concurrent.TimeoutException
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import domain.Currency
 
 // Define the ExchangeRate interface
@@ -20,13 +21,12 @@ trait ExchangeRateServiceTrait {
   def retrieveExchangeRate(currency: Currency, date: Instant): Future[Double]
 }
 
-class ExchangeRateService(implicit materializer: Materializer, executionContext: ExecutionContext, system: ClassicActorSystemProvider) extends ExchangeRateServiceTrait {
+class ExchangeRateService(apiClient: ExchangeRateApiClient, fallbackApiClient: ExchangeRateApiClient)
+                         (implicit materializer: Materializer, executionContext: ExecutionContext, system: ClassicActorSystemProvider)
+  extends ExchangeRateServiceTrait {
 
-  private val config = ConfigFactory.load()
-  private val exchangeAPI = config.getString("app.exchangeAPI")
-  private val fallbackExchangeAPI = config.getString("app.fallbackExchangeAPI")
   private val log: LoggingAdapter = Logging(system.classicSystem, getClass)
-  // Circuit Breaker initialization
+
   private val breaker = new CircuitBreaker(
     system.classicSystem.scheduler,
     maxFailures = 5,
@@ -34,46 +34,28 @@ class ExchangeRateService(implicit materializer: Materializer, executionContext:
     resetTimeout = 1.minute
   )
 
-  private def retrieveRate(apiUrl: String, currency: Currency, date: Instant): Future[Double] = {
-    val request = HttpRequest(uri = s"${apiUrl.replaceAll("\\/latest", s"/${date}")}?symbols=${currency.toString}")
-    val responseFuture: Future[HttpResponse] = Http().singleRequest(request)
-    log.info(s"Sending request to $request") // log the request
+  private def retrieveRate(client: ExchangeRateApiClient, currency: Currency, date: Instant): Future[Double] = {
+    val requestUrl = client.constructRequestUrl(currency, date)
+    val request = HttpRequest(uri = requestUrl)
 
     breaker.withCircuitBreaker(
-      responseFuture.flatMap { response =>
-        response.status match {
-          case StatusCodes.OK =>
-            response.entity.toStrict(5.seconds).flatMap { entity =>
-              val entityString = entity.data.utf8String
-              val json = io.circe.parser.parse(entityString)
-              json match {
-                case Right(parsedJson) =>
-                  log.info(s"Retrieved rates: $parsedJson")
-                  val exchangeRates = parsedJson.hcursor.downField("rates").as[Map[String, Double]]
-                  exchangeRates match {
-                    case Right(rates) => Future.successful(rates.getOrElse(currency.toString, 0.0))
-                    case Left(error) =>
-                      log.error(s"Failed to parse exchange rates: $error")
-                      throw new RuntimeException("Failed to parse exchange rates")
-                  }
-                case Left(error) =>
-                  log.error(s"Failed to parse JSON response: $error")
-                  throw new RuntimeException("Failed to parse JSON response")
-              }
-            }
-          case ex =>
-            log.error(s"retrieveError failed: $ex")
-            throw new RuntimeException(s"Failed to retrieve exchange rates. Status: ${response.status}")
+      for {
+        response <- Http().singleRequest(request)
+        entityString <- Unmarshal(response.entity).to[String]
+        rate <- client.parseResponse(entityString, currency) match {
+          case Success(rate) => Future.successful(rate)
+          case Failure(ex) => Future.failed(ex)
         }
-      }
+      } yield rate
     )
   }
 
-  def retrieveExchangeRate(currency: Currency, date: Instant): Future[Double] = {
-    retrieveRate(exchangeAPI, currency, date).recoverWith {
+
+  override def retrieveExchangeRate(currency: Currency, date: Instant): Future[Double] = {
+    retrieveRate(apiClient, currency, date).recoverWith {
       case ex: Exception =>
-        log.error(s"Failed to retrieve exchange rates from main API, attempting to retrieve from fallback API: $ex")
-        retrieveRate(fallbackExchangeAPI, currency, date)
+        log.error(s"Failed to retrieve exchange rates from main API, error: $ex. Attempting to retrieve from fallback API.")
+        retrieveRate(fallbackApiClient, currency, date)
     }
   }
 }

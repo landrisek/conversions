@@ -3,15 +3,14 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
-import scala.io.StdIn
 import scala.concurrent.ExecutionContext
-import service.ConversionService
+import scala.io.StdIn
 
+import service.ConversionService
+import external.{MainApiClient, FallbackApiClient, ExchangeRateService}
 import api.TradeRoutes
 import cache.ExchangeRateCache
-import external.ExchangeRateActor
-import external.ExchangeRateService
-import external.ExchangeRateServiceTrait
+import com.typesafe.config.{Config, ConfigFactory}
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -22,13 +21,19 @@ object Main {
     implicit val materializer: Materializer = Materializer(classicSystem)
     implicit val executionContext: ExecutionContext = classicSystem.dispatcher
 
+    // Load config
+    val config: Config = ConfigFactory.load()
+
+    // Create API clients
+    val apiClient: MainApiClient = new MainApiClient()(config)
+    val fallbackApiClient: FallbackApiClient = new FallbackApiClient()(config)
+
     // Create ExchangeRateService
-    val exchangeRateService: ExchangeRateService = new ExchangeRateService()(materializer, executionContext, classicSystem)
+    val exchangeRateService: ExchangeRateService = new ExchangeRateService(apiClient, fallbackApiClient)(materializer, executionContext, classicSystem)
 
     // Create ConversionService actor
     val exchangeRateCache: ActorRef[ExchangeRateCache.Command] = typedSystem.systemActorOf(ExchangeRateCache(exchangeRateService), "exchangeRateCache")
-    val exchangeRateActor: ActorRef[ExchangeRateActor.Command] = typedSystem.systemActorOf(ExchangeRateActor(exchangeRateService), "exchangeRateActor")
-
+    
     val conversionServiceActor = typedSystem.systemActorOf(ConversionService(exchangeRateCache)(typedSystem, classicSystem.dispatcher), "conversionServiceActor")
 
     // Define the HTTP route
